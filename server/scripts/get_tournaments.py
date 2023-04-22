@@ -5,7 +5,7 @@ import requests
 import datetime
 import json
 
-overwrite_tourneys = True
+overwrite_tourneys = False
 
 # Paste your api key into a text file called 'eminence_api_key.txt'
 with open("./eminence_api_key.txt", 'r') as f:
@@ -74,8 +74,6 @@ if __name__ == '__main__':
                 for i, j in enumerate(tourney['standings']):
                     if 'decklist' in j.keys():
                         if j['decklist']:
-                            if tourney['TID'] == 'F3tTixdc2jvUe9Q7R0FT':
-                                print(j['decklist'])
                             db[tourney['TID']].update_one({'standing': i+1}, {'$set': {'decklist': j['decklist']}})
         except:
             if 'TID' in tourney.keys():
