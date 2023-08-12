@@ -51,16 +51,11 @@ const TERMS = [
       // { $lte: `is less than (\u2264)`, type: "number" },
     ],
   },
-  {
-    name: "Commander",
-    tag: "commander",
-    cond: [],
-  },
-  {
-    name: "Colors",
-    tag: "colors",
-    cond: [],
-  },
+  // {
+  //   name: "Colors",
+  //   tag: "colors",
+  //   cond: [],
+  // },
   {
     name: "Wins",
     tag: "wins",
@@ -99,6 +94,7 @@ const TERMS = [
   },
 ];
 
+
 export default function SingleTournamentView({ setCommanderExist }) {
   const { TID } = useParams();
 
@@ -107,16 +103,57 @@ export default function SingleTournamentView({ setCommanderExist }) {
       TID: TID,
     },
   };
+  
+  const loadFilters = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    let generated_filters = {};
+    params.forEach((val, key) => {
+      generated_filters = insertIntoObject(
+        generated_filters,
+        key.split("__"),
+        val
+      );
+    });
+
+    return Object.entries(generated_filters).length > 0
+      ? generated_filters
+      : defaultFilters;
+  }, []);
 
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState(defaultFilters);
   const [allFilters, setAllFilters] = useState(defaultFilters);
+  const [colors, setColors] = useState((loadFilters.colorID ?? "").split(""));
   const [sort, setSort] = useState("standing");
   const [toggled, setToggled] = useState(false);
   const [metabreakdown, setMetabreakdown] = useState(false); // Whether or not insigt view is displayed
   const [tournamentName, setTournamentName] = useState("");
+    /**
+   * @TODO Build filterString from colors and filters
+   */
+    useEffect(() => {
+      let newFilters = { ...filters, colorID: null };
+      if (colors !== [] && colors.join("") !== "") {
+        newFilters = {
+          ...filters,
+          colorID: colors.join(""),
+        };
+      }
+  
+      if (newFilters != allFilters) {
+        setAllFilters(newFilters);
+  
+        navigate(
+          {
+            search: `${createSearchParams(compressObject(newFilters))}`,
+          },
+          { replace: true }
+        );
+      }
+    }, [colors, filters]);
 
   axios
     .post(
@@ -146,8 +183,12 @@ export default function SingleTournamentView({ setCommanderExist }) {
   function getFilters(data) {
     setFilters(data);
   }
-  
-  function toggleMetabreakdown(){
+
+  function getColors(data) {
+    setColors(data);
+  }
+
+  function toggleMetabreakdown() {
     setMetabreakdown(!metabreakdown);
   }
 
@@ -198,17 +239,17 @@ export default function SingleTournamentView({ setCommanderExist }) {
   return !metabreakdown ? (
     <div className="flex flex-col flex-grow overflow-auto">
       <Banner
-        title={
-          !tournamentName ? "View Tournaments" : tournamentName
-        }
+        title={!tournamentName ? "View Tournaments" : tournamentName}
         enableFilters={true}
+        enableColors={true}
         getFilters={getFilters}
         allFilters={allFilters}
         defaultFilters={defaultFilters}
+        defaultColors={colors}
         terms={TERMS}
-        enablecolors={false}
+        getColors={getColors}
         backEnabled
-        enableMetaBreakdownButton = {true}
+        enableMetaBreakdownButton={true}
         metabreakdownMessage="Meta Breakdown"
         toggleMetabreakdown={toggleMetabreakdown}
       />
@@ -350,24 +391,9 @@ export default function SingleTournamentView({ setCommanderExist }) {
               </p>
             </td>
             <td>
-              <p onClick={() => handleSort("colors")}
-                
-                className="flex flex-row items-center gap-1 font-bold"
-                >
-                  Colors
-                  
-                {sort ==="colors" ? (
-                  <RxChevronDown
-                    className={`${
-                      toggled ? "" : "rotate-180"
-                    } transition-all duration-200k`}
-                  />
-                ) : (
-                  <RxCaretSort
-                    className={`text-lightText dark:text-text transition-all duration-200k`}
-                  />
-                )}
-                  </p>
+              <p className="flex flex-row items-center gap-1 font-bold">
+                Colors
+              </p>
             </td>
           </tr>
         </thead>
@@ -378,32 +404,44 @@ export default function SingleTournamentView({ setCommanderExist }) {
             <div className="w-full flex justify-center items-center text-accent dark:text-text font-bold text-2xl">
               No data available
             </div>
+          ) : entries && entries.length === 0 ? (
+            <div className="w-full flex justify-center items-center text-accent dark:text-text font-bold text-2xl">
+              No data available
+            </div>
           ) : (
 
-            entries && entries.length === 0 ? <div className="w-full flex justify-center items-center text-accent dark:text-text font-bold text-2xl">No data available</div> :
-              entries.map((entry, i) => (
-                <Entry
-                  rank={entry.standing}
-                  name={entry.name}
-                  mox={entry.decklist}
-                  metadata={[
-                    entry.commander,
-                    entry.wins,
-                    entry.losses,
-                    entry.draws,
-                    Number(entry.winRate  * 100).toFixed(2) + "%",
-                  ]}
-                  colors={entry.colorID}
-                  layout="WLD"
-                  metadata_fields={['Commander', 'Wins', 'Losses', 'Draws', 'Win rate']} 
-                  filters={allFilters}
-                />
-              ))
+            entries.map((entry, i) => (
+              <Entry
+                rank={entry.standing}
+                name={entry.name}
+                mox={entry.decklist}
+                metadata={[
+                  entry.commander,
+                  entry.wins,
+                  entry.losses,
+                  entry.draws,
+                  Number(entry.winRate * 100).toFixed(2) + "%",
+                ]}
+                colors={entry.colorID}
+                layout="WLD"
+                metadata_fields={[
+                  "Commander",
+                  "Wins",
+                  "Losses",
+                  "Draws",
+                  "Win rate",
+                ]}
+                filters={allFilters}
+              />
+            ))
           )}
         </tbody>
       </table>
     </div>
   ) : (
-    <CommanderView setCommanderExist={setCommanderExist} _filters={defaultFilters}></CommanderView>
+    <CommanderView
+      setCommanderExist={setCommanderExist}
+      _filters={defaultFilters}
+    ></CommanderView>
   );
 }
