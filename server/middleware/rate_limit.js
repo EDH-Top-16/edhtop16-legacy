@@ -11,7 +11,7 @@ const rateLimiter = rateLimit({
 
 const globablRateLimit = rateLimit({
   windowMS: 60 * 1000, // 1 min
-  max: 12,
+  max: 12000,
   message: "Too many requests. Please try again in 1 min.",
   statusCode: 429,
   standardHeaders: true,
