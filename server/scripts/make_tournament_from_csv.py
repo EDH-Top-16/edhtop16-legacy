@@ -33,14 +33,14 @@ with open(filepath) as f:
     name_index = row_1.index("name")
     decklist_index = row_1.index("decklist")
 
-    swiss_index, wins_index, losses_indes, draws_index = [-1] * 4
+    swiss_index, wins_index, losses_index, draws_index = [-1] * 4
     if not all(i in row_1 for i in ["wins", "losses", "draws"]):
         swiss_index = row_1.index("swiss points")
         win_points = int(input("Enter win points >> "))
         draw_points = int(input("Enter draw points >> "))
     else:
         wins_index = row_1.index("wins")
-        losses_indes = row_1.index("losses")
+        losses_index = row_1.index("losses")
         draws_index = row_1.index("draws")
 
     total_rounds = int(input("Enter total swiss rounds >> "))
@@ -59,7 +59,7 @@ with open(filepath) as f:
         else:
             wins = int(line[wins_index])
             draws = int(line[draws_index])
-            losses = int(losses_indes)
+            losses = int(line[losses_index])
 
         if top_cut_included:
             wins_bracket = bracket_rounds - math.ceil(math.log(standing, 4))
