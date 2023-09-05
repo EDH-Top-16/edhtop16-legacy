@@ -44,7 +44,7 @@ with open(filepath) as f:
         draws_index = row_1.index("draws")
 
     total_rounds = int(input("Enter total swiss rounds >> "))
-    top_cut = int(input("Enter top cut >> ")) if top_cut_included else 0
+    top_cut = int(input("Enter top cut >> "))
     bracket_rounds = math.ceil(math.log(top_cut, 4)) if top_cut > 0 else 0
     date_created = int(dateutil.parser.isoparse(input("Date created ISO timestamp (YYYY-MM-DD minimum) >> ")).timestamp())
 
@@ -61,12 +61,15 @@ with open(filepath) as f:
             draws = int(line[draws_index])
             losses = int(line[losses_index])
 
+        wins_bracket = bracket_rounds - math.ceil(math.log(standing + 1, 4))
+        losses_bracket = 1 if standing > 1 and standing <= top_cut else 0
+
         if top_cut_included:
-            wins_bracket = bracket_rounds - math.ceil(math.log(standing, 4))
-            losses_bracket = 1 if standing > 1 and standing <= top_cut else 0
+            wins_swiss = wins - wins_bracket
+            losses_swiss = losses - losses_bracket
         else:
-            wins_bracket = 0
-            losses_bracket = 0
+            wins_swiss = wins
+            losses_swiss = losses
 
         standings.append(
             {"name": name,
@@ -74,14 +77,14 @@ with open(filepath) as f:
             "wins": wins,
             "draws": draws,
             "losses": losses,
-            "winsSwiss": wins - wins_bracket,
+            "winsSwiss": wins_swiss,
             "drawsSwiss": draws,
-            "lossesSwiss": losses - losses_bracket,
-            "winRate": wins / (wins + losses + draws),
-            "winRateSwiss": (wins - wins_bracket) / total_rounds,
-            "winRateBracket": wins_bracket / (wins_bracket + losses_bracket) if top_cut_included else None,
-            "winsBracket": wins_bracket if top_cut_included else None,
-            "lossesBracket": losses_bracket if top_cut_included else None
+            "lossesSwiss": losses_swiss,
+            "winRate": wins / (wins + losses + draws) if wins + losses + draws != 0 else None,
+            "winRateSwiss": wins_swiss / total_rounds if total_rounds != 0 else None,
+            "winRateBracket": wins_bracket / (wins_bracket + losses_bracket) if wins_bracket + losses_bracket != 0 else None,
+            "winsBracket": wins_bracket,
+            "lossesBracket": losses_bracket
             })
 
     metadata = {
