@@ -69,7 +69,9 @@ with open(filepath) as f:
             losses_swiss = losses - losses_bracket
         else:
             wins_swiss = wins
+            wins += wins_bracket
             losses_swiss = losses
+            losses += losses_bracket
 
         standings.append(
             {"name": name,
