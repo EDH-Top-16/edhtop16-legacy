@@ -86,7 +86,8 @@ with open(filepath) as f:
             "winRateSwiss": wins_swiss / total_rounds if total_rounds != 0 else None,
             "winRateBracket": wins_bracket / (wins_bracket + losses_bracket) if wins_bracket + losses_bracket != 0 else None,
             "winsBracket": wins_bracket,
-            "lossesBracket": losses_bracket
+            "lossesBracket": losses_bracket,
+            "decklist": line[decklist_index]
             })
 
     metadata = {
