@@ -46,6 +46,7 @@ with open(filepath) as f:
     total_rounds = int(input("Enter total swiss rounds >> "))
     top_cut = int(input("Enter top cut >> "))
     bracket_rounds = math.ceil(math.log(top_cut, 4)) if top_cut > 0 else 0
+    size = int(input("Enter tournament size >> "))
     date_created = int(dateutil.parser.isoparse(input("Date created ISO timestamp (YYYY-MM-DD minimum) >> ")).timestamp())
 
     for standing, line in enumerate(reader):
@@ -96,7 +97,8 @@ with open(filepath) as f:
         "dateCreated": date_created,
         "date": datetime.datetime.fromtimestamp(date_created),
         "topCut": top_cut,
-        "swissNum": total_rounds
+        "swissNum": total_rounds,
+        "size": size
     }
 
 client = MongoClient("mongodb://localhost:27017")
