@@ -63,7 +63,7 @@ with open(filepath) as f:
             losses = int(line[losses_index])
 
         wins_bracket = bracket_rounds - math.ceil(math.log(standing + 1, 4))
-        losses_bracket = 1 if standing > 1 and standing <= top_cut else 0
+        losses_bracket = 1 if standing + 1 > 1 and standing + 1 <= top_cut else 0
 
         if top_cut_included:
             wins_swiss = wins - wins_bracket
