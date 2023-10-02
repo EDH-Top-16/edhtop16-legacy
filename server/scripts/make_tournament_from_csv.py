@@ -81,7 +81,6 @@ with open(filepath) as f:
             "draws": draws,
             "losses": losses,
             "winsSwiss": wins_swiss,
-            "drawsSwiss": draws,
             "lossesSwiss": losses_swiss,
             "winRate": wins / (wins + losses + draws) if wins + losses + draws != 0 else None,
             "winRateSwiss": wins_swiss / total_rounds if total_rounds != 0 else None,
