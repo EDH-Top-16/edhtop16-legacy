@@ -192,7 +192,7 @@ export default function CommanderView({setCommanderExist}, _filters) {
    */
   useEffect(() => {
     // console.log("filterscolorschanged", filters, colors);
-    let newFilters = { ...filters, colorID: undefined };
+    let newFilters = { ...filters, colorID: null };
     if (!!colors && colors.join("") !== "") {
       newFilters = {
         ...filters,
