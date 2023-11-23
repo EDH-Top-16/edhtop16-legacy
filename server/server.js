@@ -4,9 +4,10 @@ const cors = require("cors");
 require("dotenv").config({ path: "./config.env" });
 const port = process.env.PORT || 5000;
 
-const { rateLimiter } = require("./middleware/rate_limit");
+const { rateLimiter, globablRateLimit } = require("./middleware/rate_limit");
 
 app.use(rateLimiter);
+app.use(globablRateLimit);
 
 app.use(cors());
 app.use(express.json({ strict: false }));
