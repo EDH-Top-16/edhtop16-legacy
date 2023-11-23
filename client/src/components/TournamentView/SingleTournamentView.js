@@ -51,16 +51,96 @@ const TERMS = [
       // { $lte: `is less than (\u2264)`, type: "number" },
     ],
   },
-  // {
-  //   name: "Commander",
-  //   tag: "commander",
-  //   cond: [],
-  // },
-  // {
-  //   name: "Colors",
-  //   tag: "colors",
-  //   cond: [],
-  // },
+  {
+    name: "Commander",
+    tag: "commander",
+    cond: [],
+  },
+  {
+    name: "Colors",
+    tag: "colors",
+    cond: [],
+  },
+  {
+    name: "Wins",
+    tag: "wins",
+    cond: [
+      { $gte: `is greater than (\u2265)`, type: "number" },
+      { $eq: `is equal to (=)`, type: "number" },
+      { $lte: `is less than (\u2264)`, type: "number" },
+    ],
+  },
+  {
+    name: "Losses",
+    tag: "losses",
+    cond: [
+      { $gte: `is greater than (\u2265)`, type: "number" },
+      { $eq: `is equal to (=)`, type: "number" },
+      { $lte: `is less than (\u2264)`, type: "number" },
+    ],
+  },
+  {
+    name: "Draws",
+    tag: "draws",
+    cond: [
+      { $gte: `is greater than (\u2265)`, type: "number" },
+      { $eq: `is equal to (=)`, type: "number" },
+      { $lte: `is less than (\u2264)`, type: "number" },
+    ],
+  },
+  {
+    name: "Win Rate",
+    tag: "winRate",
+    cond: [
+      { $gte: `is greater than (\u2265)`, type: "number" },
+      { $eq: `is equal to (=)`, type: "number" },
+      { $lte: `is less than (\u2264)`, type: "number" },
+    ],
+  },
+];
+
+const TERMS_NO_COMMANDER = [
+  {
+    name: "Standing",
+    tag: "standing",
+    cond: [
+      {
+        $lte: `Top X:`,
+        component: "select",
+        type: "number",
+        values: [
+          {
+            value: null,
+            name: "Filter By Top X",
+            disabled: true,
+            selected: true,
+          },
+          {
+            value: 1,
+            name: "Top 1",
+          },
+          {
+            value: 4,
+            name: "Top 4",
+          },
+          {
+            value: 16,
+            name: "Top 16",
+          },
+          {
+            value: 32,
+            name: "Top 32",
+          },
+          {
+            value: 64,
+            name: "Top 64",
+          },
+        ],
+      },
+      // { $eq: `is equal to (=)`, type: "number" },
+      // { $lte: `is less than (\u2264)`, type: "number" },
+    ],
+  },
   {
     name: "Wins",
     tag: "wins",
@@ -203,7 +283,7 @@ export default function SingleTournamentView({ setCommanderExist }) {
         getFilters={getFilters}
         allFilters={allFilters}
         defaultFilters={defaultFilters}
-        terms={TERMS}
+        terms={!metabreakdown ? TERMS_NO_COMMANDER : TERMS}
         enablecolors={false}
         backEnabled
         enableMetaBreakdownButton={true}
