@@ -51,16 +51,16 @@ const TERMS = [
       // { $lte: `is less than (\u2264)`, type: "number" },
     ],
   },
-  {
-    name: "Commander",
-    tag: "commander",
-    cond: [],
-  },
-  {
-    name: "Colors",
-    tag: "colors",
-    cond: [],
-  },
+  // {
+  //   name: "Commander",
+  //   tag: "commander",
+  //   cond: [],
+  // },
+  // {
+  //   name: "Colors",
+  //   tag: "colors",
+  //   cond: [],
+  // },
   {
     name: "Wins",
     tag: "wins",
