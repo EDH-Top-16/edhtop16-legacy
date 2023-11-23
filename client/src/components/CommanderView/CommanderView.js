@@ -14,6 +14,7 @@ import { createSearchParams, useNavigate } from "react-router-dom";
 import { compressObject, insertIntoObject } from "../../utils";
 import { RxCaretSort, RxChevronDown } from "react-icons/rx";
 import SingleTournamentView from "../TournamentView/SingleTournamentView";
+import _ from "lodash";
 
 const TERMS = [
   {
@@ -190,16 +191,16 @@ export default function CommanderView({setCommanderExist}, _filters) {
    * @TODO Build filterString from colors and filters
    */
   useEffect(() => {
-    // console.log(filters, colors);
-    let newFilters = { ...filters, colorID: null };
-    if (colors !== [] && colors.join("") !== "") {
+    // console.log("filterscolorschanged", filters, colors);
+    let newFilters = { ...filters, colorID: undefined };
+    if (!!colors && colors.join("") !== "") {
       newFilters = {
         ...filters,
         colorID: colors.join(""),
       };
     }
 
-    if (newFilters != allFilters) {
+    if (!_.isEqual(newFilters, allFilters)) {
       setAllFilters(newFilters);
 
       navigate(
@@ -212,6 +213,7 @@ export default function CommanderView({setCommanderExist}, _filters) {
   }, [colors, filters]);
 
   useEffect(() => {
+    // console.log("filterschanged");
     if (!!filters.tourney_filter && "TID" in filters.tourney_filter) {
       axios
         .post(
@@ -226,7 +228,7 @@ export default function CommanderView({setCommanderExist}, _filters) {
     } else {
       setTournamentName("");
     }
-  }, [filters, allFilters]);
+  }, [allFilters]);
 
   /**
    * Main getCommanders() API call
@@ -234,7 +236,7 @@ export default function CommanderView({setCommanderExist}, _filters) {
    */
   useEffect(() => {
     let { entries } = allFilters;
-    // console.log(entries);
+    // console.log("allfilters", allFilters);
 
     getCommanders({
       ...allFilters,
@@ -247,7 +249,17 @@ export default function CommanderView({setCommanderExist}, _filters) {
       setCommanders(sortedCommanders);
       setIsLoading(false);
     });
-  }, [sort, toggled, topX, allFilters]);
+  }, [allFilters]);
+
+  useEffect(() => {
+    // console.log("sorttoggledtopx", sort, toggled, topX);
+    let { entries } = allFilters;
+    const commanderRankings = getCommanderRankings(commanders, entries, topX);
+    // console.log("Commander Rankings:", commanderRankings);
+    const sortedCommanders = sortEntries(commanderRankings, sort, toggled);
+    setCommanders(sortedCommanders);
+    setIsLoading(false);
+  }, [sort, toggled, topX]);
 
   /**
    * These two functions get data from colorSelection and filters child components
