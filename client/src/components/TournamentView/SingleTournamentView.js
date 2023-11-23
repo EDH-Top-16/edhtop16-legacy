@@ -52,16 +52,6 @@ const TERMS = [
     ],
   },
   {
-    name: "Commander",
-    tag: "commander",
-    cond: [],
-  },
-  {
-    name: "Colors",
-    tag: "colors",
-    cond: [],
-  },
-  {
     name: "Wins",
     tag: "wins",
     cond: [
@@ -99,6 +89,7 @@ const TERMS = [
   },
 ];
 
+
 export default function SingleTournamentView({ setCommanderExist }) {
   const { TID } = useParams();
 
@@ -107,16 +98,57 @@ export default function SingleTournamentView({ setCommanderExist }) {
       TID: TID,
     },
   };
+  
+  const loadFilters = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    let generated_filters = {};
+    params.forEach((val, key) => {
+      generated_filters = insertIntoObject(
+        generated_filters,
+        key.split("__"),
+        val
+      );
+    });
+
+    return Object.entries(generated_filters).length > 0
+      ? generated_filters
+      : defaultFilters;
+  }, []);
 
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState(defaultFilters);
   const [allFilters, setAllFilters] = useState(defaultFilters);
+  const [colors, setColors] = useState((loadFilters.colorID ?? "").split(""));
   const [sort, setSort] = useState("standing");
   const [toggled, setToggled] = useState(false);
   const [metabreakdown, setMetabreakdown] = useState(false); // Whether or not insigt view is displayed
   const [tournamentName, setTournamentName] = useState("");
+    /**
+   * @TODO Build filterString from colors and filters
+   */
+    useEffect(() => {
+      let newFilters = { ...filters, colorID: null };
+      if (colors !== [] && colors.join("") !== "") {
+        newFilters = {
+          ...filters,
+          colorID: colors.join(""),
+        };
+      }
+  
+      if (newFilters != allFilters) {
+        setAllFilters(newFilters);
+  
+        navigate(
+          {
+            search: `${createSearchParams(compressObject(newFilters))}`,
+          },
+          { replace: true }
+        );
+      }
+    }, [colors, filters]);
 
   axios
     .post(
@@ -145,6 +177,10 @@ export default function SingleTournamentView({ setCommanderExist }) {
 
   function getFilters(data) {
     setFilters(data);
+  }
+
+  function getColors(data) {
+    setColors(data);
   }
 
   function toggleMetabreakdown() {
@@ -200,11 +236,13 @@ export default function SingleTournamentView({ setCommanderExist }) {
       <Banner
         title={!tournamentName ? "View Tournaments" : tournamentName}
         enableFilters={true}
+        enableColors={true}
         getFilters={getFilters}
         allFilters={allFilters}
         defaultFilters={defaultFilters}
+        defaultColors={colors}
         terms={TERMS}
-        enablecolors={false}
+        getColors={getColors}
         backEnabled
         enableMetaBreakdownButton={true}
         metabreakdownMessage="Meta Breakdown"
